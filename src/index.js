@@ -1,41 +1,48 @@
 'use strict';
 
 // checkbox
-const checkbox = document.querySelectorAll('.filter-check_checkbox');
-// console.dir(checkbox);
-checkbox.forEach((elem) => {
-    elem.addEventListener('change', function() {
-        if (this.checked){
-            this.nextElementSibling.classList.add('checked');
-        } else {
-            this.nextElementSibling.classList.remove('checked');
-        }
+function toggleCheckBox() {
+    
+
+    const checkbox = document.querySelectorAll('.filter-check_checkbox');
+    // console.dir(checkbox);
+    checkbox.forEach((elem) => {
+        elem.addEventListener('change', function() {
+            if (this.checked){
+                this.nextElementSibling.classList.add('checked');
+            } else {
+                this.nextElementSibling.classList.remove('checked');
+            }
+        });
     });
-});
+}
+
+toggleCheckBox();
 // end checkbox
 
-// корзина
-const btnCart = document.getElementById('cart');
-const modalCart = document.querySelector('.cart');
-const btnCartClose = document.querySelector('.cart-close');
+// toggle cart
+function toggleCart () {
+  const btnCart = document.getElementById('cart');
+  const modalCart = document.querySelector('.cart');
+  const btnCartClose = document.querySelector('.cart-close');
 
-btnCart.addEventListener( 'click', () => {
-    // console.log('clik on cart');
-    modalCart.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-});
+  btnCart.addEventListener('click', () => {
+      // console.log('clik on cart');
+      modalCart.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+  });
 
-btnCartClose.addEventListener('click', () =>{
-    modalCart.style.display = 'none';
-    document.body.style.overflow = '';
-});
-// end корзина
+  btnCartClose.addEventListener('click', () => {
+      modalCart.style.display = 'none';
+      document.body.style.overflow = '';
+  });
+}
+
+toggleCart();
+// end toggle cart
 
 
-
-// end worck with goods
-
-//getdata
+//getData
 function getData(){
     const goodsWrapper = document.querySelector(".goods");
     return fetch('./db/db.json')
@@ -92,16 +99,16 @@ function renderCatalog(){
     });
 }
 
-// end getdata
+// end getData
 
 getData().then( (data) => {
     renderCards(data);
     //all functions
     renderCatalog();
-    addEventOnCart();
+    processingCart();
 });
 
-//print goods card in main
+//print goods cards in main
 function renderCards(data){
     const goodsWrapper = document.querySelector('.goods');
     data.goods.forEach( (good) => {
@@ -124,21 +131,40 @@ function renderCards(data){
         goodsWrapper.appendChild(card);
     });
 }
-// renderCards()
+// end renderCards
 
 // worck with goods
 
-function addEventOnCart () {
-
-    const cards = document.querySelectorAll('.goods .card');
-    const cartWrapper = document.querySelector('.cart-wrapper');
-    const cartEmptyLabel = document.getElementById('cart-empty');
-    const cartCounter = document.querySelector('.counter');
+function processingCart () {
+    const cards = document.querySelectorAll('.goods .card'),
+          cartWrapper = document.querySelector('.cart-wrapper'),
+          cartEmptyLabel = document.getElementById('cart-empty'),
+          cartCounter = document.querySelector('.counter');
+        
+        
     // console.log(cards);
 
     function showData() {
-        const cardsCart = cartWrapper.querySelectorAll('.card');
+        const cardsPrice = cartWrapper.querySelectorAll('.card-price'),
+              sumTotal = document.querySelector('.cart-total span'),
+              cardsCart = cartWrapper.querySelectorAll('.card');
+        let cartSum = 0;
+
         cartCounter.textContent = cardsCart.length;
+        // console.log('"cardіPrice:"', cardіPrice);
+        
+        cardsPrice.forEach((cardPrice) => {
+            // console.log(parseFloat(cardPrice.textContent));
+            cartSum += (parseFloat(cardPrice.textContent));
+        });
+
+        sumTotal.textContent = cartSum;
+
+        if (cardsCart.length !== 0) {
+            cartEmptyLabel.textContent = '';
+        } else {
+            cartEmptyLabel.textContent = 'Ваша корзина пока пуста';
+        }
     }// end showData
 
     cards.forEach((card) => {
@@ -146,11 +172,17 @@ function addEventOnCart () {
         
         cardBtn.addEventListener('click', () => {
         const cardClone = card.cloneNode(true);
+        const removeBtn = cardClone.querySelector('.btn');
+        removeBtn.textContent = 'Удалить';
+        removeBtn.addEventListener('click', () => {
+            cardClone.remove();
+            showData();
+        });
         cartWrapper.appendChild(cardClone);
-        cartEmptyLabel.remove();
+        
         showData();
         });
     });
 
-} // end addEventOnCart
+} // end processingCart
 
