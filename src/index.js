@@ -50,7 +50,7 @@ function getData(){
         if (response.ok){
             return (response.json());
         } else {
-            throw new Error ('Data not tacked ' + response.status);
+            throw new Error ('Data not received ' + response.status);
         }
     })
     .then( (data) => {
@@ -106,6 +106,7 @@ getData().then( (data) => {
     //all functions
     renderCatalog();
     processingCart();
+    actionPage();
 });
 
 //print goods cards in main
@@ -141,9 +142,6 @@ function processingCart () {
           cartEmptyLabel = document.getElementById('cart-empty'),
           cartCounter = document.querySelector('.counter');
         
-        
-    // console.log(cards);
-
     function showData() {
         const cardsPrice = cartWrapper.querySelectorAll('.card-price'),
               sumTotal = document.querySelector('.cart-total span'),
@@ -151,7 +149,6 @@ function processingCart () {
         let cartSum = 0;
 
         cartCounter.textContent = cardsCart.length;
-        // console.log('"cardіPrice:"', cardіPrice);
         
         cardsPrice.forEach((cardPrice) => {
             // console.log(parseFloat(cardPrice.textContent));
@@ -169,20 +166,42 @@ function processingCart () {
 
     cards.forEach((card) => {
         const cardBtn = card.querySelector('button');
-        
+
         cardBtn.addEventListener('click', () => {
-        const cardClone = card.cloneNode(true);
-        const removeBtn = cardClone.querySelector('.btn');
-        removeBtn.textContent = 'Удалить';
-        removeBtn.addEventListener('click', () => {
-            cardClone.remove();
+            const cardClone = card.cloneNode(true);
+            const removeBtn = cardClone.querySelector('.btn');
+            
+            removeBtn.textContent = 'Удалить';
+            removeBtn.addEventListener('click', () => {
+                cardClone.remove();
+                showData();
+            });
+            cartWrapper.appendChild(cardClone);
+
             showData();
-        });
-        cartWrapper.appendChild(cardClone);
-        
-        showData();
         });
     });
 
 } // end processingCart
 
+// processing with Filters
+function actionPage() {
+    const cards = document.querySelectorAll('.goods .card'),
+        discountCheckBox = document.getElementById('discount-checkbox');
+    
+    discountCheckBox.addEventListener('click', () => {
+        cards.forEach((card) => {
+            if (discountCheckBox.checked){
+                if(!card.querySelector('.card-sale')){
+                    card.parentNode.style.display = 'none';
+                }
+            } else {
+                card.parentNode.style.display = '';
+            }
+        });
+    });
+
+}
+
+
+// end processing with Filters
