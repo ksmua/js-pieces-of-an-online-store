@@ -187,7 +187,9 @@ function processingCart () {
 // processing with Filters
 function actionPage() {
     const cards = document.querySelectorAll('.goods .card'),
-        discountCheckBox = document.getElementById('discount-checkbox');
+        discountCheckBox = document.getElementById('discount-checkbox'),
+        min = document.getElementById('min'),
+        max = document.getElementById('max');
     
     discountCheckBox.addEventListener('click', () => {
         cards.forEach((card) => {
@@ -201,6 +203,21 @@ function actionPage() {
         });
     });
 
+    function filterPrice() {
+        cards.forEach( (card) => {
+            const cardPrice = card.querySelector('.card-price');
+            const price = parseFloat(cardPrice.textContent);
+
+            if ( (min.value && price < min.value) || (max.value && price > max.value) ){
+                card.parentNode.style.display = 'none';
+            } else {
+                card.parentNode.style.display = '';
+            }
+        });
+    }
+
+    min.addEventListener('change', filterPrice);
+    max.addEventListener('change', filterPrice);
 }
 
 
